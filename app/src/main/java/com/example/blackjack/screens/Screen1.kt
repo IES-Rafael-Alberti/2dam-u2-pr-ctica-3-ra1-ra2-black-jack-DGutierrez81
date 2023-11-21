@@ -3,12 +3,16 @@ package com.example.blackjack.screens
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -44,22 +48,22 @@ fun Screen1(navController: NavHostController){
 @Preview(showBackground = true)
 @Composable
 fun Juego(){
+    val context = LocalContext.current
+    var carta by rememberSaveable { mutableStateOf("vuelta") }
+    var baraja by rememberSaveable { mutableStateOf(Baraja.creaBaraja()) }
+    val mazo by rememberSaveable { mutableStateOf("vuelta") }
+    var cartasEnMano by rememberSaveable { mutableStateOf(listOf(carta, carta))}
+    var show  by rememberSaveable { mutableStateOf(true) }
+    var contador by rememberSaveable { mutableStateOf(0) }
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
         .paint(
             painterResource(id = R.drawable.tapete),
             contentScale = ContentScale.FillBounds
         )) {
-
-        val context = LocalContext.current
-        var baraja by rememberSaveable { mutableStateOf(Baraja.creaBaraja()) }
-        val mazo by rememberSaveable { mutableStateOf("vuelta") }
-        var carta by rememberSaveable { mutableStateOf("vuelta") }
         val (box1, box2, box3, box4) = createRefs()
-        val topGuide = createGuidelineFromTop(0.6f)
+        val topGuide = createGuidelineFromTop(0.7f)
         val topGuide2 = createGuidelineFromBottom(0.7f)
-        var show  by rememberSaveable { mutableStateOf(true) }
-
         Box(
             modifier = Modifier
                 .constrainAs(box1){
@@ -72,6 +76,7 @@ fun Juego(){
                 MostrarCarta(mazo, context)
                 Baraja.barajar(baraja)
             }
+
         }
 
         Box(
@@ -82,7 +87,12 @@ fun Juego(){
                     end.linkTo(parent.end)
                 }
         ){
-            MostrarCarta(carta, context)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                for(i in cartasEnMano){
+                        MostrarCarta(i, context)
+                    }
+            }
         }
         Box(
             modifier = Modifier
@@ -102,28 +112,47 @@ fun Juego(){
                 end.linkTo(parent.end)
             }
         ){
-            Row {
-                // Al pulsarlo nos muestra la siguiente carta, si la baraja está vacia nos devuelve un mensaje
-                Button(onClick = { carta = if (baraja.isEmpty()) {
+            Botones(
+                DarCarta = {carta = if (baraja.isEmpty()) {
                     Toast.makeText( context,"La baraja está vacía ", Toast.LENGTH_SHORT).show()
                     show = false
                     "vuelta"
                 } else {
                     val cartaDada = Baraja.dameCarta(baraja)
                     "${cartaDada.nombre}_${cartaDada.palo}".lowercase()
-                }}, modifier = Modifier.padding(3.dp),
-                    colors = ButtonDefaults.buttonColors(Color.Yellow)) {
-                    Text(text = "Dar carta")
                 }
-                // Al pulsarlo se baraja de nuevo y se pone el mazo de nuevo en la mesa.
-                Button(onClick = {baraja = Baraja.creaBaraja()
+                    cartasEnMano = cartasEnMano.toMutableList().apply { set(contador, carta) }
+                    contador ++},
+                Reiniciar = {baraja = Baraja.creaBaraja()
                     show = true
-                    carta = "vuelta"}, modifier = Modifier.padding(3.dp),
-                    colors = ButtonDefaults.buttonColors(Color.Yellow)
-                ) {
-                    Text(text = "Reiniciar", modifier = Modifier)
+                    carta = "vuelta"
+                    cartasEnMano = listOf("vuelta", "vuelta")}
+                /*
+                Row {
+                    // Al pulsarlo nos muestra la siguiente carta, si la baraja está vacia nos devuelve un mensaje
+                    Button(onClick = { carta = if (baraja.isEmpty()) {
+                        Toast.makeText( context,"La baraja está vacía ", Toast.LENGTH_SHORT).show()
+                        show = false
+                        "vuelta"
+                    } else {
+                        val cartaDada = Baraja.dameCarta(baraja)
+                        "${cartaDada.nombre}_${cartaDada.palo}".lowercase()
+                    }}, modifier = Modifier.padding(3.dp),
+                        colors = ButtonDefaults.buttonColors(Color.Yellow)) {
+                        Text(text = "Dar carta")
+                    }
+                    // Al pulsarlo se baraja de nuevo y se pone el mazo de nuevo en la mesa.
+                    Button(onClick = {baraja = Baraja.creaBaraja()
+                        show = true
+                        carta = "vuelta"}, modifier = Modifier.padding(3.dp),
+                        colors = ButtonDefaults.buttonColors(Color.Yellow)
+                    ) {
+                        Text(text = "Reiniciar", modifier = Modifier)
+                    }
                 }
-            }
+
+                 */
+            )
         }
     }
 }
@@ -142,7 +171,29 @@ fun MostrarCarta(
     Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName) ),
         contentDescription = "Carta mostrada",
         modifier = Modifier
-            .height(200.dp)
-            .width(100.dp)
+            .height(150.dp)
+            .width(75.dp)
     )
+}
+
+@Composable
+fun Botones(
+    DarCarta: () -> Unit,
+    Reiniciar: () -> Unit
+){
+    Row {
+        MyButton(onClick = { DarCarta() }, texto = "Dar carta")
+        MyButton(onClick = { Reiniciar() }, texto = "Reiniciar")
+    }
+}
+@Composable
+fun MyButton(
+    onClick: ()-> Unit,
+    texto: String
+){
+    Button(onClick = { onClick() },
+        modifier = Modifier.padding(3.dp),
+        colors = ButtonDefaults.buttonColors(Color.Yellow)) {
+        Text(text = texto)
+    }
 }

@@ -12,7 +12,7 @@ class Baraja {
             baraja.clear()
             for(palo in Palos.values()){
                 for(naipe in Naipes.values())
-                    baraja.add(Carta(naipe, palo))
+                    baraja.add(Carta(naipe, palo, naipe.puntosMin, naipe.puntosMax))
             }
             return baraja
         }
@@ -29,7 +29,7 @@ class Baraja {
          * @param baraja Recibe el mazo de la que hay que quitar la carta
          * @return Devuelve la carta eliminada.
          */
-        fun dameCarta(baraja: MutableList<Carta>): Carta = baraja.removeAt(baraja.size - 1)
+        fun dameCarta(baraja: MutableList<Carta>): Carta = baraja.removeLast()
 
     }
 }

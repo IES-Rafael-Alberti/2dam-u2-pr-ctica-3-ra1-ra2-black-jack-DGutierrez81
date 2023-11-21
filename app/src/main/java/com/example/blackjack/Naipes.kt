@@ -1,6 +1,6 @@
 package com.example.blackjack
 
-enum class Naipes(puntosMin: Int, puntosMax: Int) {
+enum class Naipes(val puntosMin: Int,val puntosMax: Int) {
     AS(1, 11),
     DOS(2, 2),
     TRES( 3, 3),
