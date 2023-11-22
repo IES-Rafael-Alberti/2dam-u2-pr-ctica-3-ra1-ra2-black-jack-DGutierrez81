@@ -19,5 +19,9 @@ class Jugador(val nombre: String, var fichas: Int = 100) {
        // puntos += carta.valor // Suponiendo que Carta tiene un atributo "valor"
     }
 
+    fun verMano(): MutableList<Carta>{
+        return this.manoCartas
+    }
+
     // Otras funciones relacionadas con el jugador y su mano, como evaluar la puntuación, etc.
 }
