@@ -40,7 +40,9 @@ import androidx.navigation.navArgument
 import com.example.blackjack.model.Routes
 import com.example.blackjack.screens.Juego
 import com.example.blackjack.screens.Screen1
+import com.example.blackjack.screens.Screen2
 import com.example.blackjack.ui.theme.BlackJackTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +57,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = Routes.Screen1.route){
                         composable(Routes.Screen1.route){Screen1(navController)}
+                        composable(Routes.Screen2.route){Screen2(navController) }
                     }
                 }
             }
