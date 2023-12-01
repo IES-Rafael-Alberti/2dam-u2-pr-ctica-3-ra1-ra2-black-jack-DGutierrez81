@@ -45,7 +45,7 @@ import com.example.blackjack.R
 import com.example.blackjack.ui.theme.Jugador
 
 
-
+// Comentario para poder realizar el commit
 
 /**
  * Función principal donde se incia el juego y realiza las acciones principales.
