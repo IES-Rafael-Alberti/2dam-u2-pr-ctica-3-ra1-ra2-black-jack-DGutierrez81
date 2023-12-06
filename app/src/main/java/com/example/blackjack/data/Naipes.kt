@@ -1,4 +1,4 @@
-package com.example.blackjack
+package com.example.blackjack.data
 
 enum class Naipes(val puntosMin: Int,val puntosMax: Int) {
     AS(1, 11),

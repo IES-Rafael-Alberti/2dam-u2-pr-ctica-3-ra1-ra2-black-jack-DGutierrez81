@@ -1,50 +1,32 @@
 package com.example.blackjack.screens
 
-import android.content.Context
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstrainedLayoutReference
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintLayoutBaseScope
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import com.example.blackjack.Baraja
-import com.example.blackjack.Carta
 import com.example.blackjack.R
-import com.example.blackjack.ui.theme.Jugador
-
-
 
 
 /**
@@ -52,23 +34,96 @@ import com.example.blackjack.ui.theme.Jugador
  */
 //@Preview(showBackground = true)
 @Suppress("SpellCheckingInspection")
+
 @Composable
-fun Screen2(navController: NavHostController){
-    Juego()
+//navController: NavHostController, Viewmodel: Viewmodel
+fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
+    // val carta: String by Viewmodel.carta.observeAsState(initial = "reverso2")
+    //  val show: Boolean by Viewmodel.show.observeAsState(initial = true)
+    Tapete(R.drawable.tapten)
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .weight(1f),
+        ) {
+            Row {
+                IndicadorJugador2()
+                Monedas()
+                IndicardorPuntos2(Viewmodel)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Botones()
+            }
+            MostrarCartasEnMano()
+        }
+
+        Column(
+            modifier = Modifier.fillMaxSize().weight(1f)
+                .padding(start = 25.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            MostrarMazo()
+        }
+        Column(
+            Modifier
+                .fillMaxSize().weight(1f),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            MostrarCartasEnMano()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Botones()
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IndicardorPuntos1(Viewmodel)
+                Monedas()
+                IndicadorJugador1()
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun Juego(){
+fun Jugador(Viewmodel: Viewmodel){
+    Row(){
+
+    }
+}
+
+
+
+//@Preview(showBackground = true)
+/*
+@Composable
+fun Juego(Viewmodel: Viewmodel){
+    val show: Boolean by Viewmodel.show.observeAsState(initial = true)
     val context = LocalContext.current
-    var carta by rememberSaveable { mutableStateOf("reverso2") }
     var baraja by rememberSaveable { mutableStateOf(Baraja.creaBaraja()) }
     var cartasEnMano by rememberSaveable { mutableStateOf(mutableListOf(carta, carta))}
-    var show  by rememberSaveable { mutableStateOf(true) }
+
     var contador by rememberSaveable { mutableStateOf(0) }
     var enabled by rememberSaveable { mutableStateOf(true)}
 
+    if(show) {
+        MostrarMazo("reverso2", context)
+        Baraja.barajar(baraja)
+    }
 
+ */
+
+/*
     Tapete(R.drawable.tapten)
     MostrarCartasEnMano(context, cartasEnMano, contador)
     if(show) {
@@ -76,30 +131,10 @@ fun Juego(){
         Baraja.barajar(baraja)
     }
 
-    Botones(
-        Apostar = {},
-        PedirCarta = {carta = if (baraja.isEmpty()) {
-            Toast.makeText( context,"La baraja está vacía ", Toast.LENGTH_SHORT).show()
-            show = false
-            "reverso2"
-        } else {
-            val cartaDada = Baraja.dameCarta(baraja)
-            "${cartaDada.nombre}_${cartaDada.palo}".lowercase()
-        }
-            if(contador>1) cartasEnMano.add(carta)
-            cartasEnMano = cartasEnMano.toMutableList().apply { set(contador, carta) }
-            contador ++},
-        enabled = enabled,
-        Reiniciar = {baraja = Baraja.creaBaraja()
-            show = true
-            enabled = true
-            carta = "reverso2"
-            cartasEnMano = mutableListOf("reverso2", "reverso2")
-            contador = 0
-        },
-        Plantarse = {enabled = false}
-    )
+
 }
+
+ */
 
 
 
@@ -112,18 +147,115 @@ fun Tapete(@DrawableRes tapeteID: Int){
     )
 }
 
+@Composable
+fun Monedas(){
+    Image(painter = painterResource(id = R.drawable.monedas),
+        contentDescription = "Monedas del juego",
+        modifier = Modifier
+            .height(30.dp)
+            .width(30.dp)
+            .padding(2.dp))
+}
+
+@Composable
+fun IndicadorJugador1(){
+    Text(text = "jugador 1",
+        color = Color.White,
+        modifier = Modifier.padding(top = 4.dp, end = 10.dp),
+        fontSize = 10.sp)
+}
+@Composable
+fun IndicadorJugador2(){
+    Text(text = "jugador 2",
+        color = Color.White,
+        modifier = Modifier.padding(10.dp),
+        fontSize = 10.sp)
+}
+
+
+@Composable
+fun IndicardorPuntos1(Viewmodel: Viewmodel) {
+    val puntos = Viewmodel.MostrarPuntos(1).toString()
+    Text(text = puntos,
+        color = Color.White,
+        modifier = Modifier.padding(top = 4.dp),
+        fontSize = 10.sp)
+}
+
+@Composable
+fun IndicardorPuntos2(Viewmodel: Viewmodel) {
+    val puntos = Viewmodel.MostrarPuntos(2).toString()
+    Text(text = puntos,
+        color = Color.White,
+        modifier = Modifier.padding(top = 10.dp),
+        fontSize = 10.sp)
+}
+
+@Composable
+fun Botones(){
+    MyButton(onClick = {  }, enabled = true, texto = "Apostar")
+    MyButton(onClick = {  }, enabled = true, texto = "PedirCarta")
+    //MyButton(onClick = { Reiniciar() }, enabled =  true, texto = "Reiniciar")
+    MyButton(onClick = {  }, enabled = true, texto = "Plantarse")
+}
+
+@Composable
+fun MyButton(
+    onClick: ()-> Unit,
+    enabled: Boolean,
+    texto: String
+) {
+    Button(
+        onClick = { onClick() },
+        modifier = Modifier.padding(3.dp),
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(Color(0xFFA54A2D))
+    ) {
+        Text(text = texto)
+    }
+}
+
+
 /**
  * Muestra la carta indicada
  * @param carta Recibe un String con el nombre de la carta a mostrar.
  * @param context Recibe el contexto.
  */
-@Suppress("SpellCheckingInspection")
+//@Suppress("SpellCheckingInspection")
+
 
 @Composable
-fun MostrarCarta(
-    carta: String,
-    context: Context
+fun MostrarCarta(carta: String, zIndex: Int) {
+    val context = LocalContext.current
+    Box(
+        modifier = Modifier
+            .zIndex(zIndex.toFloat()) // Ajusta el índice Z para superponer las cartas
+    ) {
+        Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName)),
+            contentDescription = "Carta mostrada",
+            modifier = Modifier
+                .height(150.dp)
+                .width(75.dp)
+        )
+    }
+}
+
+
+/*
+@Composable
+fun MostrarCarta(carta: String
 ){
+    val context = LocalContext.current
+
+    Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName)),
+        contentDescription = "Carta mostrada",
+        modifier = Modifier
+            .height(150.dp)
+            .width(75.dp)
+    )
+
+    //(painter = painterResource(id = carta.idDrawable)
+/*
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -131,38 +263,71 @@ fun MostrarCarta(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName) ),
+        Image(painter = painterResource(id = carta.idDrawable),
             contentDescription = "Carta mostrada",
             modifier = Modifier
                 .height(150.dp)
                 .width(75.dp)
         )
     }
+
+ */
 }
+
+ */
+@Composable
+fun MostrarCartasEnMano() {
+    val cartasEnMano = listOf<String>("reverso2", "reverso2")
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        item {
+            Box() {
+                cartasEnMano.forEachIndexed { index, carta ->
+                    MostrarCarta(carta, index)
+                }
+            }
+        }
+    }
+}
+
+/*
+@Composable
+fun MostrarCartasEnMano() {
+
+    val cartasEnMano = listOf<String>("reverso2", "reverso2")
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        item { for(i in cartasEnMano){
+            Spacer(modifier = Modifier.width(32.dp))
+            MostrarCarta(i)
+        } }
+    }
+}
+
+ */
 
 
 
 
 @Composable
 fun MostrarMazo(
-    carta: String,
-    context: Context
-){
-    Column(
+) {
+    Image(
+        painter = painterResource(id = R.drawable.reverso2),
+        contentDescription = "Carta mostrada",
         modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 25.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
-    ) {
-        Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName) ),
-            contentDescription = "Carta mostrada",
-            modifier = Modifier
-                .height(150.dp)
-                .width(75.dp)
-        )
-    }
+            .height(150.dp)
+            .width(75.dp)
+    )
 }
+/*
+
 @Composable
 fun MostrarCartasEnMano(context: Context, cartasEnMano: List<String>, contador: Int) {
 
@@ -221,6 +386,10 @@ fun Botones(
     }
 
 }
+
+
+ */
+
 
 
 /*
@@ -474,6 +643,3 @@ fun jugador(
 }
 
  */
-
-
-

@@ -1,4 +1,4 @@
-package com.example.blackjack.model
+package com.example.blackjack.data
 
 
 sealed class Routes(val route: String) {
