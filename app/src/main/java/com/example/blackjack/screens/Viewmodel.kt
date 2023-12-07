@@ -3,30 +3,16 @@ package com.example.blackjack.screens
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.blackjack.data.Baraja
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ViewModel
-import com.example.blackjack.data.Baraja.Companion.baraja
-import com.example.blackjack.data.Carta
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.example.blackjack.R
 import com.example.blackjack.data.Jugador
 
 //class ViewModel: ViewModel()
@@ -42,11 +28,24 @@ class Viewmodel(application: Application): AndroidViewModel(application){
     private val _show = MutableLiveData<Boolean>()
     val show: LiveData<Boolean> = _show
 
+    private val _showDialog = MutableLiveData<Boolean>()
+    val showDialog: LiveData<Boolean> = _showDialog
+
     private val _cartasEnMano = MutableLiveData<MutableList<String>>()
     val cartasEnMano: LiveData<MutableList<String>> = _cartasEnMano
 
     private val jugador1 = MutableLiveData<Jugador>()
+
+    private val _nombreJugador1 = MutableLiveData<String>()
+    val nombreJugador1: LiveData<String> = _nombreJugador1
+
+    private val _nombreJugador2 = MutableLiveData<String>()
+    val nombreJugador2: LiveData<String> = _nombreJugador2
+
     private val jugador2 = MutableLiveData<Jugador>()
+
+    private val _botonInicio = MutableLiveData<Boolean>()
+    val botonInicio: LiveData<Boolean> = _botonInicio
 
         init {
             NuevaBaraja()
@@ -60,13 +59,49 @@ class Viewmodel(application: Application): AndroidViewModel(application){
         }
 
 
+    fun MostrarNombre(player: Int): String {
+        return if(player == 1){
+            _nombreJugador1.value ?: "jugador1"
+        }else{
+            _nombreJugador2.value ?: "jugador2"
+        }
+    }
 
     fun MostrarPuntos(player: Int): Int{
-        jugador1.value = Jugador("pepe", 100, ArrayList(), 100)
+
         return if(player == 1){
-            jugador1.value!!.fichas
+            jugador1.value?.fichas ?: 0
         }else jugador2.value?.fichas ?: 0
     }
+
+    fun Confirmar(opcion: Boolean){
+        _showDialog.value = opcion
+        if(!opcion){
+            _nombreJugador1.value = ""
+            _nombreJugador2.value = ""
+        }
+    }
+
+
+    fun MostrarDialogoInicio(id: Int, nombre: String) {
+        if(id == 1){
+            _nombreJugador1.value = nombre
+        }else {
+            _nombreJugador2.value = nombre
+        }
+
+        _botonInicio.value = !(_nombreJugador1.value.isNullOrEmpty() || _nombreJugador2.value.isNullOrEmpty())
+    }
+
+
+    fun Inicio(){
+        jugador1.value = Jugador(_nombreJugador1.value!!, 100, ArrayList(), 0)
+        jugador2.value = Jugador(_nombreJugador2.value!!, 100, ArrayList(), 0)
+    }
+
+
+
+
 
     /*
         @Composable

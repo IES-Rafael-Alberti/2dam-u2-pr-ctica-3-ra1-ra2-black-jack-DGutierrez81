@@ -3,6 +3,7 @@ package com.example.blackjack
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +21,7 @@ import com.example.blackjack.ui.theme.BlackJackTheme
 
 
 class MainActivity : ComponentActivity() {
+    private val viewmodel: Viewmodel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -31,8 +33,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = Routes.Screen1.route){
-                        composable(Routes.Screen1.route){Screen1(navController)}
-                        composable(Routes.Screen2.route){Screen2(navController, Viewmodel(application)) }
+                        composable(Routes.Screen1.route){Screen1(navController, viewmodel)}
+                        composable(Routes.Screen2.route){Screen2(navController, Viewmodel = viewmodel) }
                     }
                 }
             }

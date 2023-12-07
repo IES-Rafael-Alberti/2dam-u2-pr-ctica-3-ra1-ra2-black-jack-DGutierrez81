@@ -16,6 +16,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.blackjack.R
 
@@ -45,11 +48,12 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .weight(1f),
         ) {
             Row {
-                IndicadorJugador2()
+                IndicadorJugador2(Viewmodel)
                 Monedas()
                 IndicardorPuntos2(Viewmodel)
             }
@@ -63,7 +67,9 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().weight(1f)
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
                 .padding(start = 25.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
@@ -72,7 +78,8 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
         }
         Column(
             Modifier
-                .fillMaxSize().weight(1f),
+                .fillMaxSize()
+                .weight(1f),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -89,7 +96,7 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
             ) {
                 IndicardorPuntos1(Viewmodel)
                 Monedas()
-                IndicadorJugador1()
+                IndicadorJugador1(Viewmodel)
             }
         }
     }
@@ -158,15 +165,15 @@ fun Monedas(){
 }
 
 @Composable
-fun IndicadorJugador1(){
-    Text(text = "jugador 1",
+fun IndicadorJugador1(viewmodel: Viewmodel){
+    Text(text = viewmodel.MostrarNombre(1),
         color = Color.White,
         modifier = Modifier.padding(top = 4.dp, end = 10.dp),
         fontSize = 10.sp)
 }
 @Composable
-fun IndicadorJugador2(){
-    Text(text = "jugador 2",
+fun IndicadorJugador2(viewmodel: Viewmodel){
+    Text(text = viewmodel.MostrarNombre(2),
         color = Color.White,
         modifier = Modifier.padding(10.dp),
         fontSize = 10.sp)
