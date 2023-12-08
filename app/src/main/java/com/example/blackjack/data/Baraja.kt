@@ -7,8 +7,6 @@ class Baraja {
     companion object{
         val baraja = mutableListOf<Carta>()
 
-        var car = ""
-
         /**
          * Crea la baraja de cartas francesa.
          */
@@ -37,8 +35,15 @@ class Baraja {
          * @param baraja Recibe el mazo de la que hay que quitar la carta
          * @return Devuelve la carta eliminada.
          */
-        fun dameCarta(baraja: MutableList<Carta>): Carta = baraja.removeLast()
+        fun dameCarta(): Carta = baraja.removeLast()
 
+        /*
+        fun getFaceDownCard(): Card {
+            return(Card(CardsName.NINGUNA, Suits.NINGUNA, 0, 0, R.drawable.carta))
+        }
+
+
+ */
         private fun ObtenerId(context: Context, nombreCarta: String) = context.resources.getIdentifier(
             nombreCarta,
             "drawable",

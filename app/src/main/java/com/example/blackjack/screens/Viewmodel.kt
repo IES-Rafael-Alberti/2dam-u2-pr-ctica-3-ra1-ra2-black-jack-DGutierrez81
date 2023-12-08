@@ -3,6 +3,7 @@ package com.example.blackjack.screens
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -13,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.example.blackjack.R
+
+import com.example.blackjack.data.Carta
 import com.example.blackjack.data.Jugador
 
 //class ViewModel: ViewModel()
@@ -31,8 +34,8 @@ class Viewmodel(application: Application): AndroidViewModel(application){
     private val _showDialog = MutableLiveData<Boolean>()
     val showDialog: LiveData<Boolean> = _showDialog
 
-    private val _cartasEnMano = MutableLiveData<MutableList<String>>()
-    val cartasEnMano: LiveData<MutableList<String>> = _cartasEnMano
+    private val _cartasEnMano = MutableLiveData<MutableList<Carta>>()
+    val cartasEnMano: LiveData<MutableList<Carta>> = _cartasEnMano
 
     private val jugador1 = MutableLiveData<Jugador>()
 
@@ -44,13 +47,15 @@ class Viewmodel(application: Application): AndroidViewModel(application){
 
     private val jugador2 = MutableLiveData<Jugador>()
 
+    private val _baraja = MutableLiveData<Int>()
+    val baraja:LiveData<Int> = _baraja
+
     private val _botonInicio = MutableLiveData<Boolean>()
     val botonInicio: LiveData<Boolean> = _botonInicio
 
         init {
             NuevaBaraja()
         }
-
 
 
         private fun NuevaBaraja() {
@@ -99,36 +104,37 @@ class Viewmodel(application: Application): AndroidViewModel(application){
         jugador2.value = Jugador(_nombreJugador2.value!!, 100, ArrayList(), 0)
     }
 
+    fun PedirCarta(player: Int) {
 
+        if (Baraja.baraja.isEmpty()) {
+            Toast.makeText( context,"La baraja está vacía ", Toast.LENGTH_SHORT).show()
+            _show.value = false
 
+        } else {
+            jugador1.value!!.manoCartas.add(Baraja.dameCarta())
+            _cartasEnMano.value = jugador1.value!!.manoCartas
+            _baraja.value = _cartasEnMano.value!!.size
+        }
+        /*
+        if (baraja.isEmpty()) {
+            Toast.makeText( context,"La baraja está vacía ", Toast.LENGTH_SHORT).show()
+            _show.value = false
 
-
-    /*
-        @Composable
-        fun PedirCarta() {
-            if (baraja.isEmpty()) {
-                Toast.makeText( context,"La baraja está vacía ", Toast.LENGTH_SHORT).show()
-                _show.value = false
-
-            } else {
-                val cartaDada = Baraja.dameCarta(baraja)
-                cartaDada.idDrawable
-                jugador1.value?.manoCartas?.add(cartaDada)
-            }
-            /*
-            if(contador>1) _cartasEnMano.add(_carta)
-            _cartasEnMano.value = cartasEnMano.toMutableList().apply { set(contador, carta) }
-            contador ++},
-        enabled = enabled
-
-             */
+        } else {
+            val cartaDada = Baraja.dameCarta(baraja)
+            jugador1.value?.manoCartas?.add(cartaDada)
+            _cartasEnMano.value?.add(cartaDada)
         }
 
+        if(contador>1) _cartasEnMano.add(_carta)
+        _cartasEnMano.value = cartasEnMano.toMutableList().apply { set(contador, carta) }
+        contador ++},
+    enabled = enabled
 
+         */
+    }
 
-     */
-
-
+    fun MuestraCarta():ArrayList<Carta> = jugador1.value!!.manoCartas
 
 }
 /*

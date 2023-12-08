@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,20 +17,22 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.blackjack.R
+import com.example.blackjack.data.Carta
+import com.example.blackjack.data.Jugador
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import com.example.blackjack.data.Baraja
 
 
 /**
@@ -42,7 +45,7 @@ import com.example.blackjack.R
 //navController: NavHostController, Viewmodel: Viewmodel
 fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
     // val carta: String by Viewmodel.carta.observeAsState(initial = "reverso2")
-    //  val show: Boolean by Viewmodel.show.observeAsState(initial = true)
+    val show: Boolean by Viewmodel.show.observeAsState(initial = true)
     Tapete(R.drawable.tapten)
     Column(
         modifier = Modifier.fillMaxSize()
@@ -61,20 +64,22 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ){
-                Botones()
+                Botones(Viewmodel)
             }
-            MostrarCartasEnMano()
+            MostrarCartasEnMano(Viewmodel)
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-                .padding(start = 25.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
-        ) {
-            MostrarMazo()
+        if(show){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .padding(start = 25.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                MostrarMazo()
+            }
         }
         Column(
             Modifier
@@ -83,12 +88,12 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MostrarCartasEnMano()
+            MostrarCartasEnMano(Viewmodel)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ){
-                Botones()
+                Botones(Viewmodel)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -192,6 +197,7 @@ fun IndicardorPuntos1(Viewmodel: Viewmodel) {
 @Composable
 fun IndicardorPuntos2(Viewmodel: Viewmodel) {
     val puntos = Viewmodel.MostrarPuntos(2).toString()
+
     Text(text = puntos,
         color = Color.White,
         modifier = Modifier.padding(top = 10.dp),
@@ -199,11 +205,12 @@ fun IndicardorPuntos2(Viewmodel: Viewmodel) {
 }
 
 @Composable
-fun Botones(){
-    MyButton(onClick = {  }, enabled = true, texto = "Apostar")
-    MyButton(onClick = {  }, enabled = true, texto = "PedirCarta")
+fun Botones(Viewmodel: Viewmodel) {
+    var enable = true
+    MyButton(onClick = { }, enabled = enable, texto = "Apostar")
+    MyButton(onClick = { Viewmodel.PedirCarta(1) }, enabled = enable, texto = "PedirCarta")
     //MyButton(onClick = { Reiniciar() }, enabled =  true, texto = "Reiniciar")
-    MyButton(onClick = {  }, enabled = true, texto = "Plantarse")
+    MyButton(onClick = { enable = false  }, enabled = true, texto = "Plantarse")
 }
 
 @Composable
@@ -232,19 +239,39 @@ fun MyButton(
 
 
 @Composable
-fun MostrarCarta(carta: String, zIndex: Int) {
-    val context = LocalContext.current
+fun MostrarCarta(carta: Carta, baraja: Int) {
+
     Box(
         modifier = Modifier
-            .zIndex(zIndex.toFloat()) // Ajusta el índice Z para superponer las cartas
+
     ) {
-        Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName)),
-            contentDescription = "Carta mostrada",
-            modifier = Modifier
-                .height(150.dp)
-                .width(75.dp)
-        )
+        Row {
+            Image(painter = painterResource(id = carta.idDrawable),
+                contentDescription = "Carta mostrada",
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(75.dp)
+            )
+        }
     }
+}
+
+@Composable
+fun MostrarCartasEnMano(Viewmodel: Viewmodel) {
+
+    val cartasEnMano: List<Carta> by Viewmodel.cartasEnMano.observeAsState(emptyList())
+    val baraja: Int by Viewmodel.baraja.observeAsState(0)
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        item { for(i in cartasEnMano){
+            Spacer(modifier = Modifier.width(32.dp))
+            MostrarCarta(i, baraja)
+        } }
+    }
+
 }
 
 
@@ -282,23 +309,7 @@ fun MostrarCarta(carta: String
 }
 
  */
-@Composable
-fun MostrarCartasEnMano() {
-    val cartasEnMano = listOf<String>("reverso2", "reverso2")
 
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        item {
-            Box() {
-                cartasEnMano.forEachIndexed { index, carta ->
-                    MostrarCarta(carta, index)
-                }
-            }
-        }
-    }
-}
 
 /*
 @Composable
