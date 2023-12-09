@@ -109,20 +109,18 @@ fun DialogoInicio(
     val nombre1: String by viewmodel.nombreJugador1.observeAsState(initial = "")
     val nombre2: String by viewmodel.nombreJugador2.observeAsState(initial = "")
 
-    if(show) {
-        Dialog(onDismissRequest = { onDismiss()}){
-            Column(
-                modifier = Modifier
-                    .background(Color.White)
-                    .padding(24.dp)
-                    .fillMaxWidth()
-            ) {
-                TituloInscripcion()
-                InscripcionJugador(nombre1, 1, viewmodel, drawable = R.drawable.jugador1)
-                InscripcionJugador(nombre2, 2, viewmodel, drawable = R.drawable.carita)
-                Spacer(modifier = Modifier.height(16.dp))
-                Aceptar(navController, viewmodel)
-            }
+    Dialog(onDismissRequest = { onDismiss()}){
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(24.dp)
+                .fillMaxWidth()
+        ) {
+            TituloInscripcion()
+            InscripcionJugador(nombre1, 1, viewmodel, drawable = R.drawable.jugador1)
+            InscripcionJugador(nombre2, 2, viewmodel, drawable = R.drawable.carita)
+            Spacer(modifier = Modifier.height(16.dp))
+            Aceptar(navController, viewmodel)
         }
     }
 }
@@ -172,8 +170,6 @@ fun Aceptar(navController: NavHostController, viewmodel: Viewmodel){
             Text(text = "Cancelar")
         }
     }
-
-
 }
 
 /*

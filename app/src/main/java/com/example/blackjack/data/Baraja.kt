@@ -13,8 +13,9 @@ class Baraja {
         fun creaBaraja(context: Context): MutableList<Carta>{
             baraja.clear()
             for(palo in Palos.values()){
-                for(naipe in Naipes.values())
+                for(naipe in Naipes.values()){
                     baraja.add(Carta(naipe, palo, naipe.puntosMin, naipe.puntosMax, ObtenerId(context, (naipe.toString().lowercase() + "_" + palo.toString().lowercase() ))))
+                }
             }
             return baraja
         }
@@ -36,7 +37,15 @@ class Baraja {
          * @return Devuelve la carta eliminada.
          */
         fun dameCarta(): Carta = baraja.removeLast()
+        /*
+        fun dameCarta(): Carta{
+            val carta = baraja.last()
+            baraja.removeLast()
+            return carta
+        }
 
+
+         */
         /*
         fun getFaceDownCard(): Card {
             return(Card(CardsName.NINGUNA, Suits.NINGUNA, 0, 0, R.drawable.carta))

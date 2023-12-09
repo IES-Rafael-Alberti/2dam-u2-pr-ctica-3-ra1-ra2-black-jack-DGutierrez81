@@ -11,7 +11,7 @@ enum class Naipes(val puntosMin: Int,val puntosMax: Int) {
     OCHO(8,8),
     NUEVE(9,9),
     DIEZ(10,10),
-    VALET(11,11),
-    DAME(12,12),
-    ROI(13,13)
+    VALET(10,10),
+    DAME(10,10),
+    ROI(10,10)
 }

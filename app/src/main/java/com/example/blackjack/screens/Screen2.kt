@@ -2,6 +2,7 @@ package com.example.blackjack.screens
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,10 @@ import com.example.blackjack.data.Carta
 import com.example.blackjack.data.Jugador
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.blackjack.data.Baraja
+import com.example.blackjack.data.Routes
 
 
 /**
@@ -45,28 +49,28 @@ import com.example.blackjack.data.Baraja
 //navController: NavHostController, Viewmodel: Viewmodel
 fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
     // val carta: String by Viewmodel.carta.observeAsState(initial = "reverso2")
+    val enable: Boolean by Viewmodel.enable.observeAsState(true)
+    val enableButton: Boolean by Viewmodel.enableButton.observeAsState(true)
+    val enableButton2: Boolean by Viewmodel.enableButton2.observeAsState(true)
     val show: Boolean by Viewmodel.show.observeAsState(initial = true)
     Tapete(R.drawable.tapten)
+    MyButton(onClick = { Viewmodel.Reiniciar() }, enabled =  !enable, texto = "Reiniciar")
+    MensajeFinPartida(Viewmodel)
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f),
+                .weight(1.2f),
         ) {
             Row {
                 IndicadorJugador2(Viewmodel)
                 Monedas()
                 IndicardorPuntos2(Viewmodel)
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ){
-                Botones(Viewmodel)
-            }
-            MostrarCartasEnMano(Viewmodel)
+            Botones2(Viewmodel, enableButton2, 2)
+            MostrarCartasEnMano2(Viewmodel)
         }
 
         if(show){
@@ -84,17 +88,12 @@ fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
         Column(
             Modifier
                 .fillMaxSize()
-                .weight(1f),
+                .weight(1.2f),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MostrarCartasEnMano(Viewmodel)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ){
-                Botones(Viewmodel)
-            }
+            Botones(Viewmodel, enableButton, 1)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -187,7 +186,7 @@ fun IndicadorJugador2(viewmodel: Viewmodel){
 
 @Composable
 fun IndicardorPuntos1(Viewmodel: Viewmodel) {
-    val puntos = Viewmodel.MostrarPuntos(1).toString()
+    val puntos: String by Viewmodel.puntos.observeAsState("0")
     Text(text = puntos,
         color = Color.White,
         modifier = Modifier.padding(top = 4.dp),
@@ -196,7 +195,8 @@ fun IndicardorPuntos1(Viewmodel: Viewmodel) {
 
 @Composable
 fun IndicardorPuntos2(Viewmodel: Viewmodel) {
-    val puntos = Viewmodel.MostrarPuntos(2).toString()
+    //val puntos = Viewmodel.MostrarPuntos(2).toString()
+    val puntos: String by Viewmodel.puntos2.observeAsState("0")
 
     Text(text = puntos,
         color = Color.White,
@@ -205,12 +205,29 @@ fun IndicardorPuntos2(Viewmodel: Viewmodel) {
 }
 
 @Composable
-fun Botones(Viewmodel: Viewmodel) {
-    var enable = true
-    MyButton(onClick = { }, enabled = enable, texto = "Apostar")
-    MyButton(onClick = { Viewmodel.PedirCarta(1) }, enabled = enable, texto = "PedirCarta")
-    //MyButton(onClick = { Reiniciar() }, enabled =  true, texto = "Reiniciar")
-    MyButton(onClick = { enable = false  }, enabled = true, texto = "Plantarse")
+fun Botones(Viewmodel: Viewmodel, enable: Boolean, id: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ){
+        MyButton(onClick = { }, enabled = enable, texto = "Apostar")
+        MyButton(onClick = { Viewmodel.PedirCarta(id) }, enabled = enable, texto = "PedirCarta")
+        MyButton(onClick = { Viewmodel.Plantarse(1)
+            Viewmodel.Ganador(1)}, enabled = true, texto = "Plantarse")
+    }
+}
+
+@Composable
+fun Botones2(Viewmodel: Viewmodel, enable: Boolean, id: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ){
+        MyButton(onClick = { }, enabled = enable, texto = "Apostar")
+        MyButton(onClick = { Viewmodel.PedirCarta(id) }, enabled = enable, texto = "PedirCarta")
+        MyButton(onClick = { Viewmodel.Plantarse(2)
+                           Viewmodel.Ganador(2)}, enabled = true, texto = "Plantarse")
+    }
 }
 
 @Composable
@@ -239,8 +256,8 @@ fun MyButton(
 
 
 @Composable
+//fun MostrarCarta(carta: Carta) {
 fun MostrarCarta(carta: Carta, baraja: Int) {
-
     Box(
         modifier = Modifier
 
@@ -252,15 +269,16 @@ fun MostrarCarta(carta: Carta, baraja: Int) {
                     .height(150.dp)
                     .width(75.dp)
             )
+            Text(text = baraja.toString(), fontSize = 50.sp)
         }
     }
 }
 
 @Composable
 fun MostrarCartasEnMano(Viewmodel: Viewmodel) {
-
     val cartasEnMano: List<Carta> by Viewmodel.cartasEnMano.observeAsState(emptyList())
-    val baraja: Int by Viewmodel.baraja.observeAsState(0)
+    val contador: Int by Viewmodel.contador.observeAsState(0)
+
 
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
@@ -268,10 +286,58 @@ fun MostrarCartasEnMano(Viewmodel: Viewmodel) {
     ) {
         item { for(i in cartasEnMano){
             Spacer(modifier = Modifier.width(32.dp))
-            MostrarCarta(i, baraja)
+            MostrarCarta(i, contador)
+           // MostrarCarta(i)
         } }
     }
 
+}
+
+@Composable
+fun MostrarCartasEnMano2(Viewmodel: Viewmodel) {
+    val cartasEnMano: List<Carta> by Viewmodel.cartasEnMano2.observeAsState(emptyList())
+    val contador2: Int by Viewmodel.contador2.observeAsState(0)
+
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        item { for(i in cartasEnMano){
+            Spacer(modifier = Modifier.width(32.dp))
+            MostrarCarta(i, contador2)
+            // MostrarCarta(i)
+        } }
+    }
+
+}
+
+@Composable
+fun MensajeFinPartida(Viewmodel: Viewmodel){
+    val mostrarMensaje: Boolean by Viewmodel.mostrarMensaje.observeAsState(initial = false)
+    val mensaje: String by Viewmodel.mensaje.observeAsState(initial = "")
+    if(mostrarMensaje){
+        Dialog(onDismissRequest = { Viewmodel.MensajeFinPartida(false)}){
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(24.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = mensaje)
+                Spacer(modifier = Modifier.height(16.dp))
+                Salir(Viewmodel)
+            }
+        }
+    }
+}
+
+@Composable
+fun Salir(viewmodel: Viewmodel){
+    Button(
+        onClick = { viewmodel.MensajeFinPartida(false)}) {
+        Text(text = "Salir")
+    }
 }
 
 
