@@ -26,15 +26,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -42,6 +38,12 @@ import androidx.navigation.NavHostController
 import com.example.blackjack.R
 import com.example.blackjack.data.Routes
 
+
+/**
+ * Recoge el total de la vista de la pantalla principal.
+ * @param navController
+ * @param viewmodel
+ */
 @Suppress("SpellCheckingInspection")
 @Composable
 fun Screen1(navController: NavHostController, viewmodel: Viewmodel){
@@ -49,6 +51,10 @@ fun Screen1(navController: NavHostController, viewmodel: Viewmodel){
     BotonesEntrada(navController, viewmodel)
 }
 
+
+/**
+ * Muestra la imagen que se desea mostrar.
+ */
 
 @Composable
 fun Inico(){
@@ -65,11 +71,15 @@ fun Caratula(@DrawableRes caratulaID: Int){
         contentScale = ContentScale.FillBounds
     )
 }
+
+/**
+ *
+ */
 @Composable
 fun BotonesEntrada(navController: NavHostController, viewmodel: Viewmodel){
     val show: Boolean by viewmodel.showDialog.observeAsState(false)
     if(show){
-        DialogoInicio(show = true, onDismiss = {viewmodel.Confirmar(false)}, viewmodel, navController)
+        DialogoInicio(onDismiss = {viewmodel.confirmar(false)}, viewmodel, navController)
     }
     Column(
         Modifier.fillMaxSize(),
@@ -86,7 +96,7 @@ fun BotonesEntrada(navController: NavHostController, viewmodel: Viewmodel){
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = { viewmodel.Confirmar(true) }) {
+        TextButton(onClick = { viewmodel.confirmar(true) }) {
             Text(text = "Dos jugadores",
                 fontSize = 40.sp,
                 fontFamily = FontFamily.Cursive,
@@ -101,7 +111,6 @@ fun BotonesEntrada(navController: NavHostController, viewmodel: Viewmodel){
 
 @Composable
 fun DialogoInicio(
-    show: Boolean,
     onDismiss: () -> Unit,
     viewmodel: Viewmodel,
     navController: NavHostController
@@ -139,7 +148,7 @@ fun InscripcionJugador(nombre: String, id: Int, viewmodel: Viewmodel, @DrawableR
                 .clip(CircleShape)
         )
         OutlinedTextField(value = nombre,
-            onValueChange = { viewmodel.MostrarDialogoInicio(id, it) },
+            onValueChange = { viewmodel.jugadorInscribir(id, it) },
             label = { Text(text = "Introduce tu nombre")})
         //TextField(text = nombre, onValueChange = onValueChange(nombre), fontSize = 14.sp, color = Color.Gray, modifier = Modifier.padding(8.dp))
     }
@@ -158,26 +167,16 @@ fun TituloInscripcion(){
 fun Aceptar(navController: NavHostController, viewmodel: Viewmodel){
     val botonInicio: Boolean by viewmodel.botonInicio.observeAsState(false)
 
-    Row(){
+    Row{
         Button(
             enabled = botonInicio,
             onClick = { navController.navigate(Routes.Screen2.route)
-                viewmodel.Inicio()}) {
+                viewmodel.inicio()}) {
             Text(text = "Enviar")
         }
         Button(
-            onClick = { viewmodel.Confirmar(false)}) {
+            onClick = { viewmodel.confirmar(false)}) {
             Text(text = "Cancelar")
         }
     }
 }
-
-/*
-class view: ViewModel() {
-
-    private val _email = MutableLiveData<String>()
-    val email: LiveData<String> = _email
-
-}
-
- */

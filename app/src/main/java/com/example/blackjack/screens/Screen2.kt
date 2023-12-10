@@ -26,16 +26,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.blackjack.R
 import com.example.blackjack.data.Carta
-import com.example.blackjack.data.Jugador
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.blackjack.data.Baraja
 import com.example.blackjack.data.Routes
 
 
@@ -47,115 +42,85 @@ import com.example.blackjack.data.Routes
 
 @Composable
 //navController: NavHostController, Viewmodel: Viewmodel
-fun Screen2(navController: NavHostController, Viewmodel: Viewmodel){
-    // val carta: String by Viewmodel.carta.observeAsState(initial = "reverso2")
-    val enable: Boolean by Viewmodel.enable.observeAsState(true)
-    val enableButton: Boolean by Viewmodel.enableButton.observeAsState(true)
-    val enableButton2: Boolean by Viewmodel.enableButton2.observeAsState(true)
-    val show: Boolean by Viewmodel.show.observeAsState(initial = true)
-    Tapete(R.drawable.tapten)
-    MyButton(onClick = { Viewmodel.Reiniciar() }, enabled =  !enable, texto = "Reiniciar")
-    MensajeFinPartida(Viewmodel)
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+fun Screen2(navController: NavHostController, viewmodel: Viewmodel){
+    val enable: Boolean by viewmodel.enable.observeAsState(true)
+    val enableButton: Boolean by viewmodel.enableButton.observeAsState(true)
+    val enableButton2: Boolean by viewmodel.enableButton2.observeAsState(true)
+    val idJuego: Int by viewmodel.idJuego.observeAsState(initial = 0)
+    val show: Boolean by viewmodel.show.observeAsState(initial = true)
+    val apuesta: Boolean by viewmodel.apuesta.observeAsState(initial = false)
+    val fin: Boolean by viewmodel.fin.observeAsState(initial = false)
+    if(fin){
+        Tapete(R.drawable.casiex)
+        DialogoSiNo(navController, viewmodel)
+    }else{
+        Tapete(R.drawable.tapten)
+        MyButton(onClick = { viewmodel.reiniciar() }, enabled =  !enable, texto = "Reiniciar")
+        MensajeFinPartida(viewmodel)
+        VistaApuesta(viewmodel, apuesta)
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1.2f),
+            modifier = Modifier.fillMaxSize()
         ) {
-            Row {
-                IndicadorJugador2(Viewmodel)
-                Monedas()
-                IndicardorPuntos2(Viewmodel)
-            }
-            Botones2(Viewmodel, enableButton2, 2)
-            MostrarCartasEnMano2(Viewmodel)
-        }
-
-        if(show){
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(1f)
-                    .padding(start = 25.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start
+                    .weight(1.2f),
             ) {
-                MostrarMazo()
+                Row {
+                    IndicadorJugador2(viewmodel)
+                    IndicardorPuntos2(viewmodel)
+                    Monedas()
+                    Indicardorfichas2(viewmodel)
+                }
+                if(idJuego == 2){
+                    Botones2(viewmodel, enableButton2, 2)
+                    MostrarCartasEnMano2(viewmodel)
+                }
+            }
+
+            if(show){
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .padding(start = 25.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    MostrarMazo()
+                }
+            }
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .weight(1.2f),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if(idJuego == 1){
+                    MostrarCartasEnMano(viewmodel)
+                    Botones(viewmodel, enableButton, 1)
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IndicadorJugador1(viewmodel)
+                    IndicardorPuntos1(viewmodel)
+                    Monedas()
+                    Indicardorfichas1(viewmodel)
+                }
             }
         }
-        Column(
-            Modifier
-                .fillMaxSize()
-                .weight(1.2f),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            MostrarCartasEnMano(Viewmodel)
-            Botones(Viewmodel, enableButton, 1)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IndicardorPuntos1(Viewmodel)
-                Monedas()
-                IndicadorJugador1(Viewmodel)
-            }
-        }
     }
 }
-
-@Composable
-fun Jugador(Viewmodel: Viewmodel){
-    Row(){
-
-    }
-}
-
-
-
-//@Preview(showBackground = true)
-/*
-@Composable
-fun Juego(Viewmodel: Viewmodel){
-    val show: Boolean by Viewmodel.show.observeAsState(initial = true)
-    val context = LocalContext.current
-    var baraja by rememberSaveable { mutableStateOf(Baraja.creaBaraja()) }
-    var cartasEnMano by rememberSaveable { mutableStateOf(mutableListOf(carta, carta))}
-
-    var contador by rememberSaveable { mutableStateOf(0) }
-    var enabled by rememberSaveable { mutableStateOf(true)}
-
-    if(show) {
-        MostrarMazo("reverso2", context)
-        Baraja.barajar(baraja)
-    }
-
- */
-
-/*
-    Tapete(R.drawable.tapten)
-    MostrarCartasEnMano(context, cartasEnMano, contador)
-    if(show) {
-        MostrarMazo("reverso2", context)
-        Baraja.barajar(baraja)
-    }
-
-
-}
-
- */
-
-
 
 @Composable
 fun Tapete(@DrawableRes tapeteID: Int){
     Image(painter = painterResource(id = tapeteID),
         contentDescription = "",
         modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.FillBounds
-    )
+        contentScale = ContentScale.FillBounds)
 }
 
 @Composable
@@ -170,14 +135,14 @@ fun Monedas(){
 
 @Composable
 fun IndicadorJugador1(viewmodel: Viewmodel){
-    Text(text = viewmodel.MostrarNombre(1),
+    Text(text = viewmodel.mostrarNombre(1),
         color = Color.White,
         modifier = Modifier.padding(top = 4.dp, end = 10.dp),
         fontSize = 10.sp)
 }
 @Composable
 fun IndicadorJugador2(viewmodel: Viewmodel){
-    Text(text = viewmodel.MostrarNombre(2),
+    Text(text = viewmodel.mostrarNombre(2),
         color = Color.White,
         modifier = Modifier.padding(10.dp),
         fontSize = 10.sp)
@@ -185,8 +150,8 @@ fun IndicadorJugador2(viewmodel: Viewmodel){
 
 
 @Composable
-fun IndicardorPuntos1(Viewmodel: Viewmodel) {
-    val puntos: String by Viewmodel.puntos.observeAsState("0")
+fun IndicardorPuntos1(viewmodel: Viewmodel) {
+    val puntos: String by viewmodel.puntos.observeAsState("0")
     Text(text = puntos,
         color = Color.White,
         modifier = Modifier.padding(top = 4.dp),
@@ -194,9 +159,8 @@ fun IndicardorPuntos1(Viewmodel: Viewmodel) {
 }
 
 @Composable
-fun IndicardorPuntos2(Viewmodel: Viewmodel) {
-    //val puntos = Viewmodel.MostrarPuntos(2).toString()
-    val puntos: String by Viewmodel.puntos2.observeAsState("0")
+fun IndicardorPuntos2(viewmodel: Viewmodel) {
+    val puntos: String by viewmodel.puntos2.observeAsState("0")
 
     Text(text = puntos,
         color = Color.White,
@@ -205,28 +169,46 @@ fun IndicardorPuntos2(Viewmodel: Viewmodel) {
 }
 
 @Composable
-fun Botones(Viewmodel: Viewmodel, enable: Boolean, id: Int) {
+fun Indicardorfichas1(viewmodel: Viewmodel) {
+    Text(text = viewmodel.mostrarFichas(1).toString(),
+        color = Color.White,
+        modifier = Modifier.padding(top = 4.dp),
+        fontSize = 10.sp)
+}
+
+@Composable
+fun Indicardorfichas2(viewmodel: Viewmodel) {
+    Text(text = viewmodel.mostrarFichas(2).toString(),
+        color = Color.White,
+        modifier = Modifier.padding(top = 10.dp),
+        fontSize = 10.sp)
+}
+
+@Composable
+fun Botones(viewmodel: Viewmodel, enable: Boolean, id: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ){
-        MyButton(onClick = { }, enabled = enable, texto = "Apostar")
-        MyButton(onClick = { Viewmodel.PedirCarta(id) }, enabled = enable, texto = "PedirCarta")
-        MyButton(onClick = { Viewmodel.Plantarse(1)
-            Viewmodel.Ganador(1)}, enabled = true, texto = "Plantarse")
+        MyButton(onClick = { viewmodel.activarApuesta(1) }, enabled = enable, texto = "Apostar")
+        MyButton(onClick = { viewmodel.pedirCarta(id)}, enabled = enable, texto = "PedirCarta")
+        MyButton(onClick = { viewmodel.plantarse(1)
+            viewmodel.ganador()
+            viewmodel.desactivarApuesta()}, enabled = true, texto = "Plantarse")
     }
 }
 
 @Composable
-fun Botones2(Viewmodel: Viewmodel, enable: Boolean, id: Int) {
+fun Botones2(viewmodel: Viewmodel, enable: Boolean, id: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ){
-        MyButton(onClick = { }, enabled = enable, texto = "Apostar")
-        MyButton(onClick = { Viewmodel.PedirCarta(id) }, enabled = enable, texto = "PedirCarta")
-        MyButton(onClick = { Viewmodel.Plantarse(2)
-                           Viewmodel.Ganador(2)}, enabled = true, texto = "Plantarse")
+        MyButton(onClick = {viewmodel.activarApuesta(2) }, enabled = enable, texto = "Apostar")
+        MyButton(onClick = { viewmodel.pedirCarta(id) }, enabled = enable, texto = "PedirCarta")
+        MyButton(onClick = { viewmodel.plantarse(2)
+            viewmodel.ganador()
+            viewmodel.desactivarApuesta()}, enabled = true, texto = "Plantarse")
     }
 }
 
@@ -250,9 +232,9 @@ fun MyButton(
 /**
  * Muestra la carta indicada
  * @param carta Recibe un String con el nombre de la carta a mostrar.
- * @param context Recibe el contexto.
+ * @param baraja Recibe el contexto.
  */
-//@Suppress("SpellCheckingInspection")
+
 
 
 @Composable
@@ -275,9 +257,9 @@ fun MostrarCarta(carta: Carta, baraja: Int) {
 }
 
 @Composable
-fun MostrarCartasEnMano(Viewmodel: Viewmodel) {
-    val cartasEnMano: List<Carta> by Viewmodel.cartasEnMano.observeAsState(emptyList())
-    val contador: Int by Viewmodel.contador.observeAsState(0)
+fun MostrarCartasEnMano(viewmodel: Viewmodel) {
+    val cartasEnMano: List<Carta> by viewmodel.cartasEnMano.observeAsState(emptyList())
+    val contador: Int by viewmodel.contador.observeAsState(0)
 
 
     LazyRow(
@@ -294,9 +276,9 @@ fun MostrarCartasEnMano(Viewmodel: Viewmodel) {
 }
 
 @Composable
-fun MostrarCartasEnMano2(Viewmodel: Viewmodel) {
-    val cartasEnMano: List<Carta> by Viewmodel.cartasEnMano2.observeAsState(emptyList())
-    val contador2: Int by Viewmodel.contador2.observeAsState(0)
+fun MostrarCartasEnMano2(viewmodel: Viewmodel) {
+    val cartasEnMano: List<Carta> by viewmodel.cartasEnMano2.observeAsState(emptyList())
+    val contador2: Int by viewmodel.contador2.observeAsState(0)
 
 
     LazyRow(
@@ -313,11 +295,11 @@ fun MostrarCartasEnMano2(Viewmodel: Viewmodel) {
 }
 
 @Composable
-fun MensajeFinPartida(Viewmodel: Viewmodel){
-    val mostrarMensaje: Boolean by Viewmodel.mostrarMensaje.observeAsState(initial = false)
-    val mensaje: String by Viewmodel.mensaje.observeAsState(initial = "")
+fun MensajeFinPartida(viewmodel: Viewmodel){
+    val mostrarMensaje: Boolean by viewmodel.mostrarMensaje.observeAsState(initial = false)
+    val mensaje: String by viewmodel.mensaje.observeAsState(initial = "")
     if(mostrarMensaje){
-        Dialog(onDismissRequest = { Viewmodel.MensajeFinPartida(false)}){
+        Dialog(onDismissRequest = { viewmodel.mensajeFinPartida(false)}){
             Column(
                 modifier = Modifier
                     .background(Color.White)
@@ -326,7 +308,7 @@ fun MensajeFinPartida(Viewmodel: Viewmodel){
             ) {
                 Text(text = mensaje)
                 Spacer(modifier = Modifier.height(16.dp))
-                Salir(Viewmodel)
+                Salir(viewmodel)
             }
         }
     }
@@ -335,70 +317,98 @@ fun MensajeFinPartida(Viewmodel: Viewmodel){
 @Composable
 fun Salir(viewmodel: Viewmodel){
     Button(
-        onClick = { viewmodel.MensajeFinPartida(false)}) {
+        onClick = { viewmodel.mensajeFinPartida(false)}) {
         Text(text = "Salir")
     }
 }
 
 
-/*
 @Composable
-fun MostrarCarta(carta: String
-){
-    val context = LocalContext.current
+fun DialogoSiNo(navController: NavHostController, viewmodel: Viewmodel){
+    val jugador: String by viewmodel.ganador.observeAsState(initial = "")
+    Dialog(onDismissRequest = {}){
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "¡¡¡Felicidade $jugador has ganado!!!\n¿Desea jugar otra partida? S/N", modifier = Modifier.background(color = Color.White))
+            Spacer(modifier = Modifier.height(32.dp))
+            Row(horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = { navController.navigate(Routes.Screen1.route) }) {
+                    Text(text = "SI", fontSize = 15.sp)
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                Button(onClick = { viewmodel.finPartida() }) {
+                    Text(text = "NO", fontSize = 15.sp)
+                }
+            }
+        }
 
-    Image(painter = painterResource(id = context.resources.getIdentifier(carta, "drawable", context.packageName)),
-        contentDescription = "Carta mostrada",
-        modifier = Modifier
-            .height(150.dp)
-            .width(75.dp)
-    )
-
-    //(painter = painterResource(id = carta.idDrawable)
-/*
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 100.dp),
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(painter = painterResource(id = carta.idDrawable),
-            contentDescription = "Carta mostrada",
-            modifier = Modifier
-                .height(150.dp)
-                .width(75.dp)
-        )
     }
 
- */
 }
 
- */
 
-
-/*
 @Composable
-fun MostrarCartasEnMano() {
-
-    val cartasEnMano = listOf<String>("reverso2", "reverso2")
-
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        item { for(i in cartasEnMano){
-            Spacer(modifier = Modifier.width(32.dp))
-            MostrarCarta(i)
-        } }
+fun VistaApuesta(viewmodel: Viewmodel, apuesta: Boolean){
+    val fichas: Int by viewmodel.fichas.observeAsState(0)
+    val fichas2: Int by viewmodel.fichas2.observeAsState(0)
+    val apuestaTotal: Int by viewmodel.apuestaTotal.observeAsState(initial = 0)
+    val idApuesta: Int by viewmodel.idApuesta.observeAsState(0)
+    val fichasJugador: String
+    val nombre: String
+    if(idApuesta == 1){
+        fichasJugador = fichas.toString()
+        nombre = viewmodel.mostrarNombre(1)
+    }else{
+        fichasJugador = fichas2.toString()
+        nombre = viewmodel.mostrarNombre(2)
+    }
+    if(apuesta){
+        Dialog(onDismissRequest = {}){
+            Tapete(R.drawable.apuesta)
+            Column {
+                Box(modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.TopEnd){
+                    Row {
+                        Box(modifier = Modifier.width(100.dp),
+                            contentAlignment = Alignment.TopStart){
+                            Text(text = nombre, color = Color.White,fontSize = 15.sp)
+                        }
+                        Text(text = "Total", color = Color.White,fontSize = 15.sp)
+                        Spacer(modifier = Modifier.width(15.dp))
+                        Text(text = apuestaTotal.toString(), modifier = Modifier
+                            .width(100.dp)
+                            .background(color = Color.White))
+                    }
+                }
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Column(verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            Button(onClick = { viewmodel.apostar("+", idApuesta) }) {
+                                Text(text = "+", fontSize = 15.sp)
+                            }
+                            Spacer(modifier = Modifier.height(32.dp))
+                            Button(onClick = { viewmodel.apostar("-", idApuesta) }) {
+                                Text(text = "-", fontSize = 15.sp)
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = fichasJugador, modifier = Modifier
+                            .width(100.dp)
+                            .background(color = Color.White))
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Button(onClick = { viewmodel.desactivarApuesta() }) {
+                        Text(text = "Apostar", fontSize = 15.sp)
+                    }
+                }
+            }
+        }
     }
 }
-
- */
-
-
-
-
 @Composable
 fun MostrarMazo(
 ) {
