@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -34,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = Routes.Screen1.route){
                         composable(Routes.Screen1.route){Screen1(navController, viewmodel)}
-                        composable(Routes.Screen2.route){Screen2(navController, Viewmodel = viewmodel) }
+                        composable(Routes.Screen2.route){Screen2(navController, viewmodel = viewmodel) }
                     }
                 }
             }

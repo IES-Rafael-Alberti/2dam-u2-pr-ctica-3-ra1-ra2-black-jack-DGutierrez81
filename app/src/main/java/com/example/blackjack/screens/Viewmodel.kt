@@ -1,6 +1,4 @@
 package com.example.blackjack.screens
-
-
 import android.annotation.SuppressLint
 import android.app.Application
 import android.widget.Toast
@@ -182,6 +180,13 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         for (i in jugador.manoCartas) {
             puntosActuales += i.puntosMin
         }
+        for (i in jugador.manoCartas) {
+            if(i.puntosMin != i.puntosMax && (puntosActuales - i.puntosMin + i.puntosMax) <= 21){
+                puntosActuales -= i.puntosMin
+                puntosActuales += i.puntosMax
+            }
+
+        }
         if (id == 1) {
             jugador1.value!!.puntos = puntosActuales
             _puntos.value = puntosActuales.toString()
@@ -264,6 +269,26 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun maquina(){
+        var suma = 0
+        while(Baraja.baraja.isNotEmpty()){
+            jugador2.value!!.manoCartas.add(Baraja.dameCarta())
+            var bandera = false
+            for(i in jugador2.value!!.manoCartas){
+                suma += i.puntosMax
+                if(suma > 18){
+                    bandera = true
+                }
+            }
+            if(bandera) {
+                break
+            }
+        }
+        if(suma == 21){
+            _apuestaTotal.value = 25
+        }else _apuestaTotal.value = 5
+    }
+
     /**
      * Activa la opción de plantarse si se cumplen las condiciones.
      * @param id indica la id del jugador.
@@ -307,14 +332,6 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
                     _fichas2.value = 0
                     _mensaje.value =
                         "Felicidades has ganado ${jugador1.value!!.nombre}\n${jugador1.value!!.nombre}: ${jugador1.value!!.puntos} puntos\n${jugador2.value!!.nombre}: ${jugador2.value!!.puntos} puntos"
-                    if(jugador1.value!!.fichas == 0 || jugador2.value!!.fichas == 0 ){
-                        if(jugador1.value!!.fichas > jugador2.value!!.fichas) {
-                            _ganador.value = jugador1.value!!.nombre
-                        }else{
-                            _ganador.value = jugador2.value!!.nombre
-                        }
-                        _fin.value = true
-                    }
                 }
 
                 jugador1.value!!.puntos > 21 && jugador1.value!!.puntos < jugador2.value!!.puntos -> {
@@ -325,14 +342,12 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
                     _fichas2.value = 0
                     _mensaje.value =
                         "Felicidades has ganado ${jugador1.value!!.nombre}\n${jugador1.value!!.nombre}: ${jugador1.value!!.puntos} puntos\n${jugador2.value!!.nombre}: ${jugador2.value!!.puntos} puntos"
-                    if(jugador1.value!!.fichas == 0 || jugador2.value!!.fichas == 0 ){
-                        if(jugador1.value!!.fichas > jugador2.value!!.fichas) {
-                            _ganador.value = jugador1.value!!.nombre
-                        }else{
-                            _ganador.value = jugador2.value!!.nombre
-                        }
-                        _fin.value = true
-                    }
+                }
+
+                (jugador1.value!!.puntos == jugador2.value!!.puntos) && contador.value!! > contador2.value!! -> {
+                    mensajeFinPartida(true)
+                    _mensaje.value =
+                        "Felicidades has ganado ${jugador1.value!!.nombre}\n${jugador1.value!!.nombre}: ${jugador1.value!!.puntos} puntos\n${jugador2.value!!.nombre}: ${jugador2.value!!.puntos} puntos\nnúmero de cartas 1: ${contador.value}\nnúmero de cartas 2: ${contador2.value}"
                 }
 
                 jugador1.value!!.puntos == jugador2.value!!.puntos -> {
@@ -349,15 +364,15 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
                     _fichas2.value = 0
                     _mensaje.value =
                         "Felicidades has ganado ${jugador2.value!!.nombre}\n${jugador2.value!!.nombre}: ${jugador2.value!!.puntos} puntos\n${jugador1.value!!.nombre}: ${jugador1.value!!.puntos} puntos"
-                    if(jugador1.value!!.fichas == 0 || jugador2.value!!.fichas == 0 ){
-                        if(jugador1.value!!.fichas > jugador2.value!!.fichas) {
-                            _ganador.value = jugador1.value!!.nombre
-                        }else{
-                            _ganador.value = jugador2.value!!.nombre
-                        }
-                        _fin.value = true
-                    }
                 }
+            }
+            if(jugador1.value!!.fichas == 0 || jugador2.value!!.fichas == 0 ){
+                if(jugador1.value!!.fichas > jugador2.value!!.fichas) {
+                    _ganador.value = jugador1.value!!.nombre
+                }else{
+                    _ganador.value = jugador2.value!!.nombre
+                }
+                _fin.value = true
             }
         }
     }
@@ -377,44 +392,83 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
 
     fun apostar(signo: String, id: Int) {
         var fichasActuales = _apuestaTotal.value ?: 0
-        if (id == 1) {
-            var fichas1 = _fichas.value ?: 0
-            val nuevoValor: Int
-            val nuevo1: Int
-            if (signo == "+") {
-                fichasActuales += 1
-                fichas1 += 1
-                nuevoValor = fichasActuales
-                nuevo1 = fichas1
-                jugador1.value!!.fichas -= 1
+        var fichas1 = _fichas.value ?: 0
+        var fichas2 = _fichas2.value ?: 0
+            if (id == 1) {
+                val nuevoValor: Int
+                val nuevo1: Int
+                if (signo == "+") {
+                    if(jugador1.value!!.fichas == 0){
+                        Toast.makeText(
+                            context,
+                            "Tienes el máximo de fichas.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else{
+                        fichasActuales += 1
+                        fichas1 += 1
+                        nuevoValor = fichasActuales
+                        nuevo1 = fichas1
+                        jugador1.value!!.fichas -= 1
+                        _apuestaTotal.value = nuevoValor
+                        _fichas.value = nuevo1
+                    }
+                } else {
+                    if((_fichas.value ?: 0) == 0){
+                        Toast.makeText(
+                            context,
+                            "Lo siento te has quedado sin fichas",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else{
+                        fichasActuales -= 1
+                        fichas1 -= 1
+                        nuevoValor = fichasActuales
+                        nuevo1 = fichas1
+                        jugador1.value!!.fichas += 1
+                        _apuestaTotal.value = nuevoValor
+                        _fichas.value = nuevo1
+                    }
+
+                }
+
             } else {
-                fichasActuales -= 1
-                fichas1 -= 1
-                nuevoValor = fichasActuales
-                nuevo1 = fichas1
-                jugador1.value!!.fichas += 1
-            }
-            _apuestaTotal.value = nuevoValor
-            _fichas.value = nuevo1
-        } else {
-            var fichas2 = _fichas2.value ?: 0
+
             val nuevoValor: Int
             val nuevo2: Int
             if (signo == "+") {
-                fichasActuales += 1
-                fichas2++
-                nuevoValor = fichasActuales
-                nuevo2 = fichas2
-                jugador2.value!!.fichas -= 1
+                if(jugador2.value!!.fichas == 0){
+                    Toast.makeText(
+                        context,
+                        "Tienes el máximo de fichas.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }else{
+                    fichasActuales += 1
+                    fichas2++
+                    nuevoValor = fichasActuales
+                    nuevo2 = fichas2
+                    jugador2.value!!.fichas -= 1
+                    _apuestaTotal.value = nuevoValor
+                    _fichas2.value = nuevo2
+                }
             } else {
-                fichasActuales -= 1
-                fichas2--
-                nuevoValor = fichasActuales
-                nuevo2 = fichas2
-                jugador2.value!!.fichas += 1
+                if((_fichas2.value ?: 0) == 0) {
+                    Toast.makeText(
+                        context,
+                        "Lo siento te has quedado sin fichas",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }else{
+                    fichasActuales -= 1
+                    fichas2--
+                    nuevoValor = fichasActuales
+                    nuevo2 = fichas2
+                    jugador2.value!!.fichas += 1
+                    _apuestaTotal.value = nuevoValor
+                    _fichas2.value = nuevo2
+                }
             }
-            _apuestaTotal.value = nuevoValor
-            _fichas2.value = nuevo2
         }
     }
 
@@ -430,6 +484,7 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
             jugador1.value!!.fichas
         } else jugador2.value!!.fichas
     }
+
 
     /**
      * Reinicia todos los atributos a su valor de origen.

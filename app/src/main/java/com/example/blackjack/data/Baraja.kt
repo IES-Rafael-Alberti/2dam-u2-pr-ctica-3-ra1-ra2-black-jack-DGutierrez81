@@ -33,7 +33,6 @@ class Baraja {
 
         /**
          * Elimina una carta del mazo y la devuelve
-         * @param baraja Recibe el mazo de la que hay que quitar la carta
          * @return Devuelve la carta eliminada.
          */
         fun dameCarta(): Carta = baraja.removeLast()

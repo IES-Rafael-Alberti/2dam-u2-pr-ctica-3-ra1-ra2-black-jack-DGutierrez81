@@ -1,5 +1,4 @@
 package com.example.blackjack.screens
-
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -242,7 +241,6 @@ fun MyButton(
 fun MostrarCarta(carta: Carta, baraja: Int) {
     Box(
         modifier = Modifier
-
     ) {
         Row {
             Image(painter = painterResource(id = carta.idDrawable),
@@ -251,7 +249,6 @@ fun MostrarCarta(carta: Carta, baraja: Int) {
                     .height(150.dp)
                     .width(75.dp)
             )
-            Text(text = baraja.toString(), fontSize = 50.sp)
         }
     }
 }
