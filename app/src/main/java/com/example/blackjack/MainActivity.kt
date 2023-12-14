@@ -14,10 +14,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.blackjack.data.Routes
 import com.example.blackjack.screens.Screen1
 import com.example.blackjack.screens.Screen2
+import com.example.blackjack.screens.Screen3
 import com.example.blackjack.screens.Viewmodel
 import com.example.blackjack.ui.theme.BlackJackTheme
 
 
+/**
+ * Clase principal donde pone en concordancia todas las pantallas de juego.
+ */
 class MainActivity : ComponentActivity() {
     private val viewmodel: Viewmodel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +37,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Routes.Screen1.route){
                         composable(Routes.Screen1.route){Screen1(navController, viewmodel)}
                         composable(Routes.Screen2.route){Screen2(navController, viewmodel = viewmodel) }
+                        composable(Routes.Screen3.route){Screen3(navController, viewmodel = viewmodel) }
                     }
                 }
             }
