@@ -478,6 +478,7 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
             _enableButton.value = false
             if(_numeroJugadores.value == 2) _idJuego.value = 2 else {
                 maquina()
+                _idJuego.value = 3
             }
         }
     }
