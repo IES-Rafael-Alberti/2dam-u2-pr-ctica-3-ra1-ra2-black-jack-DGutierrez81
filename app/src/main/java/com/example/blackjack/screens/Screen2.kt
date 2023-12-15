@@ -304,13 +304,12 @@ fun MensajeFinPartida(viewmodel: Viewmodel){
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = mensaje, color = Color(0xFF030303),
-                    style = TextStyle(fontSize = 20.sp,
-                        shadow = Shadow(color = Color.Gray,
-                            offset = Offset(5.0f, 10.0f),
-                            blurRadius = 3f)
-                    )
+                Text(text = mensaje, color = Color(0xFF2FD836),
+                    modifier = Modifier.background(Color.White)
                 )
+                MostrarCartasEnMano(viewmodel, id = 2)
+                Spacer(modifier = Modifier.height(32.dp))
+                MostrarCartasEnMano(viewmodel, id = 1)
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomEnd){
@@ -356,7 +355,7 @@ fun DialogoSiNo(navController: NavHostController, viewmodel: Viewmodel){
                     Text(text = "SI", fontSize = 15.sp)
                 }
                 Spacer(modifier = Modifier.height(50.dp))
-                Button(onClick = { viewmodel.finPartida() }, colors = ButtonDefaults.buttonColors(Color(0xFF07A717))) {
+                Button(onClick = { viewmodel.finPartida()  }, colors = ButtonDefaults.buttonColors(Color(0xFF07A717))) {
                     Text(text = "NO", fontSize = 15.sp)
                 }
             }
@@ -407,7 +406,9 @@ fun VistaApuesta(viewmodel: Viewmodel, apuesta: Boolean){
                 }
                 Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(modifier = Modifier.fillMaxSize().weight(1.2f),
+                    Row(modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1.2f),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically) {
                         Column(verticalArrangement = Arrangement.Center,

@@ -3,6 +3,9 @@ package com.example.blackjack.data
 
 import android.content.Context
 
+/**
+ * Clase donde se crea la baraja de cartas, se baraja y se reparte cada carta.
+ */
 class Baraja {
     companion object{
         val baraja = mutableListOf<Carta>()

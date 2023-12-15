@@ -1,5 +1,8 @@
 package com.example.blackjack.data
 
+/**
+ * Clase que contiene el número de cada carta.
+ */
 enum class Naipes(val puntosMin: Int,val puntosMax: Int) {
     AS(1, 11),
     DOS(2, 2),

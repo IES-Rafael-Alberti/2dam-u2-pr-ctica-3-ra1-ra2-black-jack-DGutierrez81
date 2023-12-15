@@ -216,6 +216,9 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
             _numeroJugadores.value = 2
             confirmar(false, 2)
         }
+        _mostrarMensaje.value = false
+        _fin.value = false
+        reiniciar()
     }
 
     /**
@@ -314,6 +317,10 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Se obtiene la mano de cartas del jugador 1.
+     */
+
     private fun obtenerMazoJugador1(){
         if ((fichas.value ?: 0) == 0) Toast.makeText(
             context,
@@ -327,6 +334,9 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Se obtiene la mano de cartas del jugador 2.
+     */
     private fun obtenerMazoJugador2(){
         if ((fichas2.value ?: 0) == 0) Toast.makeText(
             context,
@@ -341,6 +351,9 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Se obtiene la mano de cartas de la máquina.
+     */
     private fun obtenerMazoMaquina(){
         jugador2.value!!.manoCartas.add(Baraja.dameCarta())
         _cartasEnMano2.value = jugador2.value!!.manoCartas
@@ -375,6 +388,11 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Se calcula los puntos que tiene  el  jugador 1.
+     * @param puntosActuales recibe los puntos actuales de la mano.
+     */
+
     private fun puntosJugador1(puntosActuales: Int){
         jugador1.value!!.puntos = puntosActuales
         _puntos.value = puntosActuales.toString()
@@ -382,12 +400,15 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
             _enableButton.value = false
             if(_numeroJugadores.value == 2) _idJuego.value = 2 else {
                 maquina()
-                _idJuego.value = 3
             }
             ganadorMano()
         }
     }
 
+    /**
+     * Se calcula los puntos que tiene  el  jugador 2.
+     * @param puntosActuales recibe los puntos actuales de la mano.
+     */
     private fun puntosJugador2(puntosActuales: Int){
         jugador2.value!!.puntos = puntosActuales
         _puntos2.value = puntosActuales.toString()
@@ -398,6 +419,10 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         ganadorMano()
     }
 
+    /**
+     * Contiene la lógica de la máquina a la hora de jugar.
+     */
+
     private fun maquina() {
         while (Baraja.baraja.isNotEmpty()) {
             pedirCarta(3)
@@ -405,25 +430,28 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
         var fichasActuales = _apuestaTotal.value ?: 0
 
+
         when (jugador2.value!!.puntos) {
             21 -> {
-                fichasActuales += 1
-
-                jugador2.value!!.fichas -= 1
+                fichasActuales += 25
+                _apuestaTotal.value = fichasActuales
+                jugador2.value!!.fichas -= 25
             }
             in 19..20 -> {
-                fichasActuales += 1
-
-                jugador2.value!!.fichas -= 1
+                fichasActuales += 5
+                _apuestaTotal.value = fichasActuales
+                jugador2.value!!.fichas -= 5
             }
             else -> {
                 fichasActuales +=1
-
+                _apuestaTotal.value = fichasActuales
                 jugador2.value!!.fichas -= 1
             }
         }
+
+
         plantarse(2)
-        _idJuego.value = 1
+
     }
 
     /**
@@ -438,6 +466,9 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Permite poder plantarse al jugador 1.
+     */
     private fun plantarJugador1(){
         if (jugador1.value!!.puntos < 15) Toast.makeText(
             context,
@@ -447,11 +478,13 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
             _enableButton.value = false
             if(_numeroJugadores.value == 2) _idJuego.value = 2 else {
                 maquina()
-                _idJuego.value = 3
             }
         }
     }
 
+    /**
+     * Permite poder plantarse al jugador 2.
+     */
     private fun plantarJugador2(){
         if (jugador2.value!!.puntos < 15) Toast.makeText(
             context,
@@ -488,6 +521,8 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
                 }
                 jugador1.value!!.puntos == jugador2.value!!.puntos -> {
                     mensajeFinPartida(true)
+                    jugador1.value!!.fichas += _fichas.value!!
+                    jugador2.value!!.fichas += _fichas2.value!!
                     _mensaje.value = "¡¡¡EMPATE!!!: ${jugador1.value!!.puntos} puntos\n${jugador2.value!!.nombre}: ${jugador2.value!!.puntos} puntos"
                 }
 
@@ -502,6 +537,9 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Si un jugador se queda sin fichas pierde la partida e indica que jugador es el ganador.
+     */
     private fun ganadorPartida(){
         if (jugador1.value!!.fichas == 0 || jugador2.value!!.fichas == 0) {
             if (jugador1.value!!.fichas > jugador2.value!!.fichas) {
@@ -539,7 +577,6 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
     private fun incrementarApuesta(id: Int){
         var fichasActuales = _apuestaTotal.value ?: 0
         var fichas: Int
-        val nuevo: Int
         val jugador: Jugador
         if(id == 1){
             fichas = _fichas.value ?: 0
@@ -557,12 +594,11 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         } else {
             fichasActuales ++
             fichas ++
-            nuevo = fichas
             jugador.fichas -= 1
             _apuestaTotal.value = fichasActuales
             if(id == 1){
-                _fichas.value = nuevo
-            }else _fichas2.value = nuevo
+                _fichas.value = fichas
+            }else _fichas2.value = fichas
         }
     }
 
@@ -574,7 +610,6 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
     private fun decrementarApuesta(id: Int){
         var fichasActuales = _apuestaTotal.value ?: 0
         var fichas: Int
-        val nuevo: Int
         val jugador: Jugador
         if(id == 1){
             fichas = _fichas.value ?: 0
@@ -592,12 +627,11 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         } else {
             fichasActuales -= 1
             fichas --
-            nuevo = fichas
             jugador.fichas += 1
             _apuestaTotal.value = fichasActuales
             if(id == 1){
-                _fichas.value = nuevo
-            }else _fichas2.value = nuevo
+                _fichas.value = fichas
+            }else _fichas2.value = fichas
 
         }
     }
@@ -622,7 +656,6 @@ class Viewmodel(application: Application) : AndroidViewModel(application) {
         _puntos.value = "0"
         _cartasEnMano2.value = mutableListOf()
         jugador2.value!!.manoCartas = mutableListOf()
-        jugador2.value!!.fichas += _apuestaTotal.value!!
         jugador2.value!!.puntos = 0
         _puntos2.value = "0"
         _fichas2.value = 0
